@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Be My Valentine? 💘</title>
+
   <style>
     :root { --bg1:#ffdde1; --bg2:#ee9ca7; }
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -15,50 +17,63 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: radial-gradient(circle at top, var(--bg1), var(--bg2));
       overflow: hidden;
+      text-align: center;
     }
 
     .card {
-      width: min(520px, 92vw);
-      background: rgba(255,255,255,0.75);
+      width: min(560px, 92vw);
+      background: rgba(255, 255, 255, 0.75);
       backdrop-filter: blur(8px);
       border-radius: 24px;
-      padding: 28px 22px;
+      padding: 30px 22px 24px;
       text-align: center;
       box-shadow: 0 18px 50px rgba(0,0,0,0.15);
       position: relative;
     }
 
-    h1 { margin: 0 0 10px; font-size: 30px; }
-    p { margin: 0 0 18px; opacity: 0.85; }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      line-height: 1.2;
+    }
 
+    p {
+      margin: 0 0 18px;
+      opacity: 0.85;
+      font-size: 16px;
+    }
+
+    /* Buttons area */
     .stage {
       position: relative;
-      height: 160px; /* space for the runaway button */
-      margin-top: 14px;
+      height: 220px;         /* gives space for the runaway button */
+      margin-top: 18px;
+      display: flex;         /* centers the initial layout */
+      justify-content: center;
+      align-items: center;
+      gap: 44px;
     }
 
     .btn {
       border: none;
       border-radius: 999px;
-      padding: 12px 18px;
+      padding: 12px 22px;
       font-size: 16px;
       cursor: pointer;
       transition: transform 0.12s ease, filter 0.12s ease;
       user-select: none;
       touch-action: manipulation;
+      white-space: nowrap;
     }
 
     .btn:active { transform: scale(0.98); }
 
     #yesBtn {
       background: #ff4d6d;
-      color: white;
-      font-weight: 700;
+      color: #fff;
+      font-weight: 800;
       box-shadow: 0 12px 24px rgba(255, 77, 109, 0.35);
-      position: absolute;
-      left: 50%;
-      top: 18px;
-      transform: translateX(-110%);
+      position: relative;   /* stays in flow */
     }
 
     #noBtn {
@@ -66,21 +81,18 @@
       color: #333;
       border: 2px solid rgba(0,0,0,0.08);
       box-shadow: 0 10px 18px rgba(0,0,0,0.08);
-      position: absolute;
-      left: 50%;
-      top: 18px;
-      transform: translateX(20%);
+      position: relative;   /* starts in flow, then becomes absolute when moving */
     }
 
     #message {
       margin-top: 14px;
       font-size: 22px;
-      font-weight: 800;
+      font-weight: 900;
       color: #c9184a;
-      min-height: 30px;
+      min-height: 32px;
     }
 
-    /* Hearts */
+    /* Floating hearts */
     .heart {
       position: absolute;
       left: 50%;
@@ -100,6 +112,7 @@
     .hidden { display: none; }
   </style>
 </head>
+
 <body>
   <div class="card">
     <h1>Will you be my Valentine? 💘</h1>
@@ -119,7 +132,6 @@
     const yesBtn = document.getElementById("yesBtn");
     const message = document.getElementById("message");
 
-    // Keep No button inside the stage
     function moveNoButton() {
       const pad = 10;
 
@@ -132,12 +144,13 @@
       const x = Math.floor(Math.random() * (maxX - pad + 1)) + pad;
       const y = Math.floor(Math.random() * (maxY - pad + 1)) + pad;
 
+      // When it starts running, take it out of flex flow and position inside stage
+      noBtn.style.position = "absolute";
       noBtn.style.left = x + "px";
       noBtn.style.top = y + "px";
-      noBtn.style.transform = "translate(0,0)";
     }
 
-    // Make it harder on touch devices too
+    // Run away on hover / touch
     noBtn.addEventListener("mouseenter", moveNoButton);
     noBtn.addEventListener("mouseover", moveNoButton);
     noBtn.addEventListener("touchstart", (e) => {
@@ -145,7 +158,7 @@
       moveNoButton();
     }, { passive: false });
 
-    // Optional: if they somehow click No, still move it
+    // If they somehow click it, still run away
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       moveNoButton();
@@ -156,16 +169,14 @@
     function spawnHeart() {
       const heart = document.createElement("div");
       heart.className = "heart";
-      heart.textContent = ["💖","💘","💝","❤️","💕"][Math.floor(Math.random()*5)];
+      heart.textContent = ["💖","💘","💝","❤️","💕"][Math.floor(Math.random() * 5)];
 
-      // random drift and size
       const dx = (Math.random() * 240 - 120).toFixed(0) + "px";
       const s = (Math.random() * 1.2 + 0.6).toFixed(2);
 
       heart.style.setProperty("--dx", dx);
       heart.style.setProperty("--s", s);
 
-      // random x across screen
       heart.style.left = (Math.random() * 100).toFixed(2) + "vw";
       heart.style.animationDuration = (Math.random() * 2.2 + 2.2).toFixed(2) + "s";
 
@@ -177,9 +188,10 @@
       // burst
       for (let i = 0; i < 18; i++) setTimeout(spawnHeart, i * 60);
 
-      // continuous
+      // continuous stream for a few seconds
       if (heartsInterval) clearInterval(heartsInterval);
       heartsInterval = setInterval(spawnHeart, 140);
+
       setTimeout(() => {
         clearInterval(heartsInterval);
         heartsInterval = null;
@@ -193,15 +205,6 @@
       yesBtn.style.filter = "brightness(0.95)";
       noBtn.classList.add("hidden");
       startHearts();
-    });
-
-    // Put No button in a random spot on load (so it feels alive)
-    window.addEventListener("load", () => {
-      // Convert to absolute coords inside stage
-      noBtn.style.left = "65%";
-      noBtn.style.top = "18px";
-      noBtn.style.transform = "translateX(-50%)";
-      setTimeout(moveNoButton, 500);
     });
   </script>
 </body>
