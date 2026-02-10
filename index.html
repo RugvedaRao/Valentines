@@ -21,36 +21,25 @@
     }
 
     .card {
-      width: min(560px, 92vw);
-      background: rgba(255, 255, 255, 0.75);
+      width: min(600px, 92vw);
+      background: rgba(255, 255, 255, 0.78);
       backdrop-filter: blur(8px);
       border-radius: 24px;
       padding: 30px 22px 24px;
-      text-align: center;
       box-shadow: 0 18px 50px rgba(0,0,0,0.15);
-      position: relative;
     }
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: 32px;
-      line-height: 1.2;
-    }
+    h1 { margin: 0 0 10px; font-size: 32px; line-height: 1.2; }
+    p  { margin: 0 0 18px; opacity: 0.85; font-size: 16px; }
 
-    p {
-      margin: 0 0 18px;
-      opacity: 0.85;
-      font-size: 16px;
-    }
-
-    .stage {
-      position: relative;
-      height: 220px;
-      margin-top: 18px;
+    /* Buttons row (center aligned) */
+    .row {
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 44px;
+      margin-top: 10px;
+      position: relative;
     }
 
     .btn {
@@ -59,7 +48,7 @@
       padding: 12px 22px;
       font-size: 16px;
       cursor: pointer;
-      transition: transform 0.12s ease, filter 0.12s ease;
+      transition: transform 0.15s ease, filter 0.12s ease;
       user-select: none;
       touch-action: manipulation;
       white-space: nowrap;
@@ -71,24 +60,23 @@
       color: #fff;
       font-weight: 800;
       box-shadow: 0 12px 24px rgba(255, 77, 109, 0.35);
-      position: relative;
     }
 
+    /* No stays visible in the row, we just "nudge" it with translate */
     #noBtn {
       background: #ffffff;
       color: #333;
       border: 2px solid rgba(0,0,0,0.08);
       box-shadow: 0 10px 18px rgba(0,0,0,0.08);
-      position: relative; /* starts centered, becomes absolute on run */
+      will-change: transform;
     }
 
     #dialogue {
-      margin-top: 6px;
+      margin-top: 16px;
       font-size: 18px;
-      font-weight: 800;
+      font-weight: 900;
       color: #7a1330;
       min-height: 28px;
-      opacity: 0.95;
     }
 
     #message {
@@ -99,6 +87,7 @@
       min-height: 32px;
     }
 
+    /* Hearts */
     .heart {
       position: absolute;
       left: 50%;
@@ -124,7 +113,7 @@
     <h1>Will you be my Valentine? 💘</h1>
     <p>Be honest… but also… choose wisely 😌</p>
 
-    <div class="stage" id="stage">
+    <div class="row">
       <button class="btn" id="yesBtn">Yes 💖</button>
       <button class="btn" id="noBtn">No 🙃</button>
     </div>
@@ -134,7 +123,6 @@
   </div>
 
   <script>
-    const stage = document.getElementById("stage");
     const noBtn = document.getElementById("noBtn");
     const yesBtn = document.getElementById("yesBtn");
     const message = document.getElementById("message");
@@ -151,45 +139,35 @@
       "Last chance de rahi hoon 😤"
     ];
 
-    let dialogueIndex = 0;
+    let idx = 0;
 
-    function showNextDialogue() {
-      dialogue.textContent = hindiDialogues[dialogueIndex];
-      dialogueIndex = (dialogueIndex + 1) % hindiDialogues.length;
+    // Move away from cursor but keep visible in row
+    function dodge() {
+      // Dialogue below (visible always)
+      dialogue.textContent = hindiDialogues[idx];
+      idx = (idx + 1) % hindiDialogues.length;
+
+      // Random small jump around its original position
+      // (so it stays visible and doesn't fly off-screen)
+      const dx = Math.floor(Math.random() * 160) - 80;  // -80..80
+      const dy = Math.floor(Math.random() * 90) - 45;   // -45..45
+
+      noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
     }
 
-    function moveNoButton() {
-      const pad = 10;
+    noBtn.addEventListener("mouseenter", dodge);
+    noBtn.addEventListener("mouseover", dodge);
 
-      const stageRect = stage.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
-
-      const maxX = stageRect.width - btnRect.width - pad;
-      const maxY = stageRect.height - btnRect.height - pad;
-
-      const x = Math.floor(Math.random() * (maxX - pad + 1)) + pad;
-      const y = Math.floor(Math.random() * (maxY - pad + 1)) + pad;
-
-      // Show dialogue clearly (not on the button)
-      showNextDialogue();
-
-      // Run away
-      noBtn.style.position = "absolute";
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
-    }
-
-    // Run away on hover / touch
-    noBtn.addEventListener("mouseenter", moveNoButton);
-    noBtn.addEventListener("mouseover", moveNoButton);
+    // Mobile: treat touch as hover
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
-      moveNoButton();
+      dodge();
     }, { passive: false });
 
+    // If they manage to click, still dodge
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      moveNoButton();
+      dodge();
     });
 
     let heartsInterval = null;
@@ -229,7 +207,6 @@
       dialogue.textContent = "Yayyy!!! 😭💖";
       yesBtn.disabled = true;
       noBtn.disabled = true;
-      noBtn.classList.add("hidden");
       startHearts();
     });
   </script>
