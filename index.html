@@ -46,9 +46,9 @@
     /* Buttons area */
     .stage {
       position: relative;
-      height: 220px;         /* gives space for the runaway button */
+      height: 220px;         /* space for runaway button */
       margin-top: 18px;
-      display: flex;         /* centers the initial layout */
+      display: flex;         /* center initial layout */
       justify-content: center;
       align-items: center;
       gap: 44px;
@@ -73,7 +73,7 @@
       color: #fff;
       font-weight: 800;
       box-shadow: 0 12px 24px rgba(255, 77, 109, 0.35);
-      position: relative;   /* stays in flow */
+      position: relative;
     }
 
     #noBtn {
@@ -81,7 +81,7 @@
       color: #333;
       border: 2px solid rgba(0,0,0,0.08);
       box-shadow: 0 10px 18px rgba(0,0,0,0.08);
-      position: relative;   /* starts in flow, then becomes absolute when moving */
+      position: relative; /* starts in flex flow, becomes absolute when moving */
     }
 
     #message {
@@ -132,6 +132,19 @@
     const yesBtn = document.getElementById("yesBtn");
     const message = document.getElementById("message");
 
+    const hindiDialogues = [
+      "Arey pakka? 😢",
+      "Soch lo zara… 💔",
+      "Dil tod doge kya? 🥺",
+      "Ek baar aur soch lo 😭",
+      "Itni bhi buri nahi hoon 😔",
+      "Sach mein No? 😶",
+      "Mummy ko kya bolun phir? 😩",
+      "Last chance de rahi hoon 😤"
+    ];
+
+    let dialogueIndex = 0;
+
     function moveNoButton() {
       const pad = 10;
 
@@ -144,10 +157,12 @@
       const x = Math.floor(Math.random() * (maxX - pad + 1)) + pad;
       const y = Math.floor(Math.random() * (maxY - pad + 1)) + pad;
 
-      // When it starts running, take it out of flex flow and position inside stage
       noBtn.style.position = "absolute";
       noBtn.style.left = x + "px";
       noBtn.style.top = y + "px";
+
+      noBtn.textContent = hindiDialogues[dialogueIndex];
+      dialogueIndex = (dialogueIndex + 1) % hindiDialogues.length;
     }
 
     // Run away on hover / touch
@@ -158,7 +173,7 @@
       moveNoButton();
     }, { passive: false });
 
-    // If they somehow click it, still run away
+    // If they somehow click No, still run away
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       moveNoButton();
@@ -185,10 +200,8 @@
     }
 
     function startHearts() {
-      // burst
       for (let i = 0; i < 18; i++) setTimeout(spawnHeart, i * 60);
 
-      // continuous stream for a few seconds
       if (heartsInterval) clearInterval(heartsInterval);
       heartsInterval = setInterval(spawnHeart, 140);
 
